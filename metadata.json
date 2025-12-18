@@ -1,0 +1,8 @@
+{
+  "name": "TRYONYOU.APP",
+  "description": "Sistema de Inteligencia de Moda y Biometría. Patente Ultimátum.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
