@@ -2,8 +2,8 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { RecipeData } from "../types";
 
-// Initialize the client
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Always initialize inside functions or ensure process.env.API_KEY is available
+const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const recipeResponseSchema: Schema = {
   type: Type.OBJECT,
@@ -32,7 +32,7 @@ const recipeResponseSchema: Schema = {
           name: { type: Type.STRING, enum: ["Protein", "Carbs", "Fat"] },
           value: { type: Type.NUMBER, description: "Amount in grams" },
           unit: { type: Type.STRING, enum: ["g"] },
-          fill: { type: Type.STRING, description: "Hex color code for chart (Protein: #8884d8, Carbs: #82ca9d, Fat: #ffc658)" }
+          fill: { type: Type.STRING, description: "Hex color code for chart" }
         },
         required: ["name", "value", "unit", "fill"]
       }
@@ -42,26 +42,27 @@ const recipeResponseSchema: Schema = {
 };
 
 export async function generateRecipe(prompt: string, imageBase64?: string): Promise<RecipeData> {
-  const model = "gemini-2.5-flash"; // Efficient for multimodal and structured data
+  const ai = getAI();
+  const model = "gemini-3-flash-preview"; 
 
-  let contents: any = prompt;
+  let contents: any;
 
   if (imageBase64) {
     contents = {
       parts: [
         {
           inlineData: {
-            mimeType: "image/jpeg", // Assuming jpeg for simplicity in this demo context
+            mimeType: "image/jpeg", 
             data: imageBase64
           }
         },
         {
-          text: `Identify the food items or dish in this image. Based on that, generate a detailed recipe. User extra context: ${prompt}`
+          text: `Identify the food items in this image and generate a professional recipe. Context: ${prompt}`
         }
       ]
     };
   } else {
-    contents = `Generate a creative recipe based on these ingredients or request: ${prompt}`;
+    contents = { parts: [{ text: `Generate a creative recipe based on: ${prompt}` }] };
   }
 
   const response = await ai.models.generateContent({
@@ -70,7 +71,7 @@ export async function generateRecipe(prompt: string, imageBase64?: string): Prom
     config: {
       responseMimeType: "application/json",
       responseSchema: recipeResponseSchema,
-      systemInstruction: "You are a world-class Michelin star chef. Create recipes that are accurate, delicious, and easy to follow. Ensure nutrition data is realistic.",
+      systemInstruction: "You are a world-class Michelin star chef. Create recipes that are accurate and delicious.",
       temperature: 0.7
     }
   });
@@ -82,45 +83,30 @@ export async function generateRecipe(prompt: string, imageBase64?: string): Prom
   return JSON.parse(response.text) as RecipeData;
 }
 
-export async function generateRecipeImage(description: string): Promise<string> {
-  // Using Imagen for high-quality food photography
-  const response = await ai.models.generateImages({
-    model: 'imagen-4.0-generate-001',
-    prompt: `Professional food photography of ${description}, overhead shot, studio lighting, 8k resolution, highly detailed, appetizing presentation, garnish`,
-    config: {
-      numberOfImages: 1,
-      aspectRatio: '16:9',
-      outputMimeType: 'image/jpeg'
-    }
-  });
-
-  if (!response.generatedImages || response.generatedImages.length === 0) {
-    throw new Error("Failed to generate image");
-  }
-
-  // The new SDK returns imageBytes directly
-  const base64String = response.generatedImages[0].image.imageBytes;
-  return `data:image/jpeg;base64,${base64String}`;
-}
-
 export async function generateVirtualTryOn(garmentDescription: string, sizeContext: string = "fitted"): Promise<string> {
-  // Simulating VTO by generating an image of a model wearing the clothes.
-  // We incorporate the sizeContext to simulate the "Perfect Fit" visual.
-  
-  const response = await ai.models.generateImages({
-    model: 'imagen-4.0-generate-001',
-    prompt: `A photorealistic mirror selfie of a person wearing ${garmentDescription}. The garment is size ${sizeContext}, fitting perfectly on the body. Retail fashion photography, fitting room lighting, 4k, highly detailed texture.`,
+  const ai = getAI();
+  // Using gemini-2.5-flash-image as per guidelines for image generation/editing
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash-image',
+    contents: {
+      parts: [
+        {
+          text: `High-end fashion photography, professional model in a studio wearing ${garmentDescription}. The fit is ${sizeContext}. Soft lighting, ultra-detailed fabric, 4k resolution, editorial style.`,
+        },
+      ],
+    },
     config: {
-      numberOfImages: 1,
-      aspectRatio: '9:16', 
-      outputMimeType: 'image/jpeg'
+      imageConfig: {
+        aspectRatio: "9:16",
+      }
     }
   });
 
-  if (!response.generatedImages || response.generatedImages.length === 0) {
-    throw new Error("Failed to generate VTO image");
+  for (const part of response.candidates[0].content.parts) {
+    if (part.inlineData) {
+      return `data:image/png;base64,${part.inlineData.data}`;
+    }
   }
 
-  const base64String = response.generatedImages[0].image.imageBytes;
-  return `data:image/jpeg;base64,${base64String}`;
+  throw new Error("Failed to generate virtual look");
 }
