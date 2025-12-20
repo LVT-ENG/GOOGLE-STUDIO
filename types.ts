@@ -78,6 +78,7 @@ export interface Product {
   image: string;
   price: number;
   tags: string[];
+  category: string;
 }
 
 export interface Mockup {

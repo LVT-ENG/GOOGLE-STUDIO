@@ -1,15 +1,101 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-const rootElement = document.getElementById('root');
-if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
-}
+    <title>TRYONYOU — Real Measure Fashion Tech</title>
 
-const root = ReactDOM.createRoot(rootElement);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+    <!-- Tailwind CDN (demo / pilot mode) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Global styles -->
+    <style>
+      body {
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system,
+          BlinkMacSystemFont, sans-serif;
+        background-color: #f8fafc;
+      }
+
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      }
+
+      button,
+      a {
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+
+      .fade-in {
+        animation: fadeIn 0.8s ease-out forwards;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
+    </style>
+
+    <!-- Import map: React 18 stable -->
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://esm.sh/react@18.2.0",
+          "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+          "lucide-react": "https://esm.sh/lucide-react@0.263.1",
+          "@google/genai": "https://esm.sh/@google/genai@0.1.1",
+          "recharts": "https://esm.sh/recharts@2.12.0"
+        }
+      }
+    </script>
+  </head>
+
+  <body class="bg-slate-50 text-slate-900 antialiased">
+    <!-- ROOT -->
+    <div id="root"></div>
+
+    <!-- ENTRY POINT -->
+    <!-- Este archivo es donde vive tu React (ProcessingView, Scan, Measure, etc.) -->
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
+
