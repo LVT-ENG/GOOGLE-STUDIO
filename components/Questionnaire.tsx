@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ArrowRight, Weight, Ruler, MapPin, Palette } from 'lucide-react';
+import { ArrowRight, Scale, Ruler, MapPin, Palette } from 'lucide-react';
 import { UserProfile } from '../types';
 
 interface Props {
@@ -56,7 +56,7 @@ export const Questionnaire: React.FC<Props> = ({ onComplete }) => {
             
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                <Weight size={16} /> Peso (kg)
+                <Scale size={16} /> Peso (kg)
               </label>
               <input 
                 required type="number" min="30" max="300"
