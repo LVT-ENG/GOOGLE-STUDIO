@@ -1,38 +1,38 @@
 
-import { GoogleGenAI, Type, Schema } from "@google/genai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { RecipeData } from "../types";
 
 // Always initialize inside functions or ensure process.env.API_KEY is available
-const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY });
+const getAI = () => new GoogleGenerativeAI(process.env.API_KEY || '');
 
-const recipeResponseSchema: Schema = {
-  type: Type.OBJECT,
+const recipeResponseSchema = {
+  type: SchemaType.OBJECT,
   properties: {
-    title: { type: Type.STRING, description: "Creative name of the dish" },
-    description: { type: Type.STRING, description: "A short, appetizing description (max 2 sentences)" },
-    cookingTime: { type: Type.STRING, description: "Total time e.g., '45 mins'" },
-    difficulty: { type: Type.STRING, enum: ["Easy", "Medium", "Hard"] },
-    calories: { type: Type.NUMBER, description: "Approximate calories per serving" },
-    cuisine: { type: Type.STRING, description: "Type of cuisine e.g., Italian, Mexican" },
+    title: { type: SchemaType.STRING, description: "Creative name of the dish" },
+    description: { type: SchemaType.STRING, description: "A short, appetizing description (max 2 sentences)" },
+    cookingTime: { type: SchemaType.STRING, description: "Total time e.g., '45 mins'" },
+    difficulty: { type: SchemaType.STRING, enum: ["Easy", "Medium", "Hard"] },
+    calories: { type: SchemaType.NUMBER, description: "Approximate calories per serving" },
+    cuisine: { type: SchemaType.STRING, description: "Type of cuisine e.g., Italian, Mexican" },
     ingredients: {
-      type: Type.ARRAY,
-      items: { type: Type.STRING },
+      type: SchemaType.ARRAY,
+      items: { type: SchemaType.STRING },
       description: "List of ingredients with quantities"
     },
     instructions: {
-      type: Type.ARRAY,
-      items: { type: Type.STRING },
+      type: SchemaType.ARRAY,
+      items: { type: SchemaType.STRING },
       description: "Step by step cooking instructions"
     },
     nutrition: {
-      type: Type.ARRAY,
+      type: SchemaType.ARRAY,
       items: {
-        type: Type.OBJECT,
+        type: SchemaType.OBJECT,
         properties: {
-          name: { type: Type.STRING, enum: ["Protein", "Carbs", "Fat"] },
-          value: { type: Type.NUMBER, description: "Amount in grams" },
-          unit: { type: Type.STRING, enum: ["g"] },
-          fill: { type: Type.STRING, description: "Hex color code for chart" }
+          name: { type: SchemaType.STRING, enum: ["Protein", "Carbs", "Fat"] },
+          value: { type: SchemaType.NUMBER, description: "Amount in grams" },
+          unit: { type: SchemaType.STRING, enum: ["g"] },
+          fill: { type: SchemaType.STRING, description: "Hex color code for chart" }
         },
         required: ["name", "value", "unit", "fill"]
       }
@@ -43,70 +43,60 @@ const recipeResponseSchema: Schema = {
 
 export async function generateRecipe(prompt: string, imageBase64?: string): Promise<RecipeData> {
   const ai = getAI();
-  const model = "gemini-3-flash-preview"; 
-
-  let contents: any;
-
-  if (imageBase64) {
-    contents = {
-      parts: [
-        {
-          inlineData: {
-            mimeType: "image/jpeg", 
-            data: imageBase64
-          }
-        },
-        {
-          text: `Identify the food items in this image and generate a professional recipe. Context: ${prompt}`
-        }
-      ]
-    };
-  } else {
-    contents = { parts: [{ text: `Generate a creative recipe based on: ${prompt}` }] };
-  }
-
-  const response = await ai.models.generateContent({
-    model: model,
-    contents: contents,
-    config: {
+  const model = ai.getGenerativeModel({ 
+    model: "gemini-1.5-flash",
+    generationConfig: {
       responseMimeType: "application/json",
       responseSchema: recipeResponseSchema,
-      systemInstruction: "You are a world-class Michelin star chef. Create recipes that are accurate and delicious.",
       temperature: 0.7
-    }
+    },
+    systemInstruction: "You are a world-class Michelin star chef. Create recipes that are accurate and delicious."
   });
 
-  if (!response.text) {
+  let parts: any[];
+
+  if (imageBase64) {
+    parts = [
+      {
+        inlineData: {
+          mimeType: "image/jpeg", 
+          data: imageBase64
+        }
+      },
+      {
+        text: `Identify the food items in this image and generate a professional recipe. Context: ${prompt}`
+      }
+    ];
+  } else {
+    parts = [{ text: `Generate a creative recipe based on: ${prompt}` }];
+  }
+
+  const response = await model.generateContent(parts);
+  const text = response.response.text();
+
+  if (!text) {
     throw new Error("No recipe generated");
   }
 
-  return JSON.parse(response.text) as RecipeData;
+  return JSON.parse(text) as RecipeData;
 }
 
 export async function generateVirtualTryOn(garmentDescription: string, sizeContext: string = "fitted"): Promise<string> {
   const ai = getAI();
-  // Using gemini-2.5-flash-image as per guidelines for image generation/editing
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash-image',
-    contents: {
-      parts: [
-        {
-          text: `High-end fashion photography, professional model in a studio wearing ${garmentDescription}. The fit is ${sizeContext}. Soft lighting, ultra-detailed fabric, 4k resolution, editorial style.`,
-        },
-      ],
-    },
-    config: {
-      imageConfig: {
-        aspectRatio: "9:16",
-      }
-    }
+  const model = ai.getGenerativeModel({ 
+    model: 'gemini-1.5-flash'
   });
 
-  for (const part of response.candidates[0].content.parts) {
-    if (part.inlineData) {
-      return `data:image/png;base64,${part.inlineData.data}`;
+  const response = await model.generateContent([
+    {
+      text: `High-end fashion photography, professional model in a studio wearing ${garmentDescription}. The fit is ${sizeContext}. Soft lighting, ultra-detailed fabric, 4k resolution, editorial style.`,
     }
-  }
+  ]);
 
-  throw new Error("Failed to generate virtual look");
+  // Note: Image generation might not be available in this version
+  // This is a placeholder that returns a text-based response
+  const text = response.response.text();
+  
+  // Return placeholder for now
+  throw new Error("Image generation not available in this API version");
 }

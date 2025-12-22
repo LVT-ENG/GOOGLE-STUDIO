@@ -115,7 +115,7 @@ export const BiometricCheckout: React.FC<Props> = ({ onSuccess }) => {
 
         {log && (
           <div className="p-3 bg-slate-100 rounded-lg text-xs font-mono text-slate-600 border border-slate-200">
-             > {log}
+             {'> '}{log}
           </div>
         )}
 
