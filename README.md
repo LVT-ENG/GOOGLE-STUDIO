@@ -18,3 +18,34 @@ Plataforma integral de moda inteligente basada en la **Patente Ultimátum**.
 **Dominios**: tryonme.com · tryonyou.com · abvetos.com/abvet.com · liveitfashion.com · vvlart.com
 
 > Sistema optimizado por Nanos para React/Vite con arquitectura SPA.
+
+## 🚀 Deployment
+
+This application is automatically deployed to GitHub Pages. See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
+
+**Live Demo**: [https://lvt-eng.github.io/GOOGLE-STUDIO/](https://lvt-eng.github.io/GOOGLE-STUDIO/)
+
+## 🛠️ Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+## 📦 Tech Stack
+
+- React 18.2.0
+- Vite 6.2.0
+- TypeScript 5.8.2
+- Lucide React (icons)
+- Recharts (data visualization)
+- Google Generative AI
