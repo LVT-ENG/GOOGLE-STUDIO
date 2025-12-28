@@ -1,0 +1,83 @@
+[
+  {
+    "id": "GLF-001",
+    "meta": {
+      "name": "Classic Wool Blazer",
+      "brand": "Lafayette Collection",
+      "type": "Jacket",
+      "cut_type": "Tailored Fit",
+      "occasion_tag": "work",
+      "image_url": "/assets/garments/blazer_classic.jpg"
+    },
+    "measurements": {
+      "chest": 100,
+      "waist": 88,
+      "shoulder_width": 45,
+      "sleeve_length": 64
+    },
+    "fabric_properties": {
+      "elasticity_percent": 5,
+      "drape_score": 8
+    }
+  },
+  {
+    "id": "GLF-002",
+    "meta": {
+      "name": "Slim-Fit Chinos",
+      "brand": "Lafayette Collection",
+      "type": "Trousers",
+      "cut_type": "Slim Fit",
+      "occasion_tag": "casual",
+      "image_url": "/assets/garments/chinos_slim.jpg"
+    },
+    "measurements": {
+      "waist": 86,
+      "hips": 102,
+      "inseam_length": 81
+    },
+    "fabric_properties": {
+      "elasticity_percent": 15,
+      "drape_score": 5
+    }
+  },
+  {
+    "id": "GLF-003",
+    "meta": {
+      "name": "Silk Evening Gown",
+      "brand": "Lafayette Couture",
+      "type": "Dress",
+      "cut_type": "Flowing",
+      "occasion_tag": "event",
+      "image_url": "/assets/garments/gown_silk.jpg"
+    },
+    "measurements": {
+      "chest": 92,
+      "waist": 70,
+      "hips": 98
+    },
+    "fabric_properties": {
+      "elasticity_percent": 2,
+      "drape_score": 9
+    }
+  },
+  {
+    "id": "GLF-004",
+    "meta": {
+      "name": "Performance Tech Polo",
+      "brand": "Lafayette Sport",
+      "type": "Shirt",
+      "cut_type": "Regular Fit",
+      "occasion_tag": "casual",
+      "image_url": "/assets/garments/polo_tech.jpg"
+    },
+    "measurements": {
+      "chest": 104,
+      "waist": 96,
+      "shoulder_width": 47
+    },
+    "fabric_properties": {
+      "elasticity_percent": 25,
+      "drape_score": 4
+    }
+  }
+]
